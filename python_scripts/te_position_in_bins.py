@@ -63,7 +63,6 @@ def get_intersect(bin_s, bin_e, te_start, te_end):
 def gen_all_bin_lists(fasta):
     bin_d = {"bin10k":{},"bin100k":{},"bin1M":{}}
     fasta_dict = get_fasta_dict(fasta)
-    print(fasta_dict)
     for seq_id in fasta_dict:
         bin_d["bin10k"][seq_id] = get_10kbp_bins(seq_id, fasta_dict[seq_id])
         bin_d["bin100k"][seq_id] = get_100kbp_bins(seq_id, fasta_dict[seq_id])

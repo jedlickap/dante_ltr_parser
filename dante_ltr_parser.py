@@ -1,5 +1,6 @@
 import argparse
 import subprocess
+import os
 from python_scripts.generate_csv import TEAnalyzer
 from python_scripts.generate_report import generate_report
 from python_scripts.fasta_parser import FastaParser
@@ -27,6 +28,10 @@ def args_from_parser():
         help='If not specified SSR for Arabidopsis: 1.5e-8 will be used'
         )
     parser.add_argument(
+        "-t", "--threads", type=int, default=os.cpu_count() / 2,
+        help=f'Number of CPUs for LTR sequences analysis default is max(cpu_count) / 2 -> {int(os.cpu_count() / 2)}'
+        )
+    parser.add_argument(
         "-out_path", "--output_path", type=str, default='/home/',
         help='Path where the output should be stored'
         )
@@ -39,9 +44,9 @@ def main():
     
     try:
         # Process GFF3 and generate CSV
-        # analyzer = TEAnalyzer(args.dante_ltr_gff, args.genome_fasta, args.synonymous_substitution_rate, args.output_path)
-        # out_csv_path = analyzer.csv_generator()
-        out_csv_path = "~/Documents/Work/42_LH_Humulus_satellites/Akagi_Hj_Hl_haploidGenomeAssemeblies_Sep_2024/Hjaponicus_haploid/DANTE_LTR_analysis/Hjap_haploid_LTR_retrotransposons_annotation_chrOnly_TE_characteristics.csv"
+        analyzer = TEAnalyzer(args.dante_ltr_gff, args.genome_fasta, args.synonymous_substitution_rate, args.output_path, args.threads)
+        out_csv_path = analyzer.csv_generator()
+        #out_csv_path = "~/Documents/Work/42_LH_Humulus_satellites/Akagi_Hj_Hl_haploidGenomeAssemeblies_Sep_2024/Hjaponicus_haploid/DANTE_LTR_analysis/Hjap_haploid_LTR_retrotransposons_annotation_chrOnly_TE_characteristics.csv"
         # Get length of thte longest sequence
         fasta_parser = FastaParser(args.genome_fasta)
         length_in_mb = fasta_parser.get_longest_sequence_in_mb()

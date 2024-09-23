@@ -1,4 +1,4 @@
-import os
+import os, shutil
 import re
 import subprocess
 from Bio import SeqIO
@@ -12,23 +12,27 @@ def _get_fasta(seq_id, start, end, fasta, name):
     print(f"BEDTOOLS GETFASTA process.returncode: {process.returncode}")
     os.remove("seq.bed")
 
-def get_te_age(seq_id, ltr1_coord_l, ltr2_coord_l, fasta):
+def get_te_age(te_index, seq_id, ltr1_coord_l, ltr2_coord_l, fasta):
     """
     LTRs coord lists with '0' based start position
     """
+    if not os.path.exists(f"{te_index}_LTR_analysis/"):
+        os.mkdir(f"{te_index}_LTR_analysis/")
+    pwd_path = os.getcwd()
+    os.chdir(f"{te_index}_LTR_analysis/")
     # get fastas
     _get_fasta(seq_id, ltr1_coord_l[0], ltr1_coord_l[1], fasta, "5LTR.fa")
     _get_fasta(seq_id, ltr2_coord_l[0], ltr2_coord_l[1], fasta, "3LTR.fa")
-
     # run
     ltr_len = []
-    for ltr_fa in  ['5LTR.fa','3LTR.fa']:
+    ltr_fa_list = ['5LTR.fa', '3LTR.fa']
+    for ltr_fa in  ltr_fa_list:
         for r in SeqIO.parse(ltr_fa, "fasta"):
             ltr_len.append(len(r.seq))
 
-    files2remove = ['5LTR.fa','3LTR.fa']
+    files2remove = ltr_fa_list
     # run stretcher
-    cmd = "stretcher " + "5LTR.fa 3LTR.fa -outfile ltrIdent.txt"
+    cmd = "stretcher " + f"{ltr_fa_list[0]} {ltr_fa_list[1]} -outfile ltrIdent.txt"
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     process.wait()
     print(f"STRETCHER process.returncode: {process.returncode}")
@@ -60,16 +64,16 @@ def get_te_age(seq_id, ltr1_coord_l, ltr2_coord_l, fasta):
             infOut.write(seq_List[0] + "\n")
             infOut.write(">3LTR\n")
             infOut.write(seq_List[1] + "\n")                
-        cmd1 = "clustalw infile.fa -output=PHYLIP"
+        cmd1 = f"clustalw infile.fa -output=PHYLIP"
         process = subprocess.Popen(cmd1, shell=True, stdout=subprocess.PIPE)
         process.wait()
         print(f"CLUSTALW with phylip output process.returncode: {process.returncode}")
 
-        os.rename('infile.phy', 'infile')
+        os.rename(f'infile.phy', 'infile')
         with open("opt_dnadist", "w") as out:
             out.write("infile\nR\nD\nY\n")
 
-        cmd1 = "cat opt_dnadist | phylip dnadist"
+        cmd1 = f"cat opt_dnadist | phylip dnadist"
         process = subprocess.Popen(cmd1, shell=True, stdout=subprocess.PIPE)
         process.wait()
         print(f"PHYLIP K80 divergence process.returncode: {process.returncode}")
@@ -90,4 +94,6 @@ def get_te_age(seq_id, ltr1_coord_l, ltr2_coord_l, fasta):
         for file in files2remove:
             if os.path.exists(file):
                 os.remove(file)
+        os.chdir(pwd_path)
+        shutil.rmtree(f"{te_index}_LTR_analysis/")
         return avgLtrLen, ltr_len, ident, k80
