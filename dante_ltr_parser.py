@@ -29,7 +29,7 @@ def args_from_parser():
         )
     parser.add_argument(
         "-t", "--threads", type=int, default=os.cpu_count() / 2,
-        help=f'Number of CPUs for LTR sequences analysis default is max(cpu_count) / 2 -> {int(os.cpu_count() / 2)}'
+        help=f'Number of CPUs for LTR sequences analysis default is {int(os.cpu_count() / 2)} CPU for your PC (max of CPU count / 2)'
         )
     parser.add_argument(
         "-out_path", "--output_path", type=str, default='/home/',
