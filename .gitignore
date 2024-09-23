@@ -1,0 +1,10 @@
+# Ignore Python compiled files and caches
+__pycache__/
+*.pyc
+
+# Ignore virtual environment folder
+dante_ltr_parser/
+
+# Ignore OS-specific files
+.DS_Store
+
