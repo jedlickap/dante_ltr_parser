@@ -33,6 +33,7 @@ class TEAnalyzer:
         for cat, (s, e) in age_dict.items():
             if s <= mya < e:
                 return cat
+                
     def _get_csv_line(self, te, te_index):
         seq_id = self.dnt_dict[te]['transposable_element'][0].seqid
         te_id = self.dnt_dict[te]['transposable_element'][0].attributes['ID']

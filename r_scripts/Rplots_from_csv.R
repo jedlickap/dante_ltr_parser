@@ -8,7 +8,6 @@ longest_seq_length <- as.numeric(args[2])
 directory_path <- dirname(csv_path)
 # csv_path <- "Saaz_LTR_retrotransposons_annotation_TE_characteristics.csv"
 t <- read.csv(csv_path, header = T)
-head(t)
 
 # load used libraries
 library(dplyr)
@@ -280,7 +279,7 @@ copiaPl6 <- ggplot(t_copia, aes(x=te_fam,y=ltr_avg_len,fill=te_fam)) +
         legend.title = element_blank(),
         legend.position="None")
 
-gypsyPl6 <- ggplot(t_gypsy, aes(x=te_fam,y=te_length,fill=te_fam)) +
+gypsyPl6 <- ggplot(t_gypsy, aes(x=te_fam,y=ltr_avg_len,fill=te_fam)) +
   geom_boxplot() +
   scale_fill_manual(values = c('#fff7ec','#fee8c8','#fdd49e','#fdbb84','#fc8d59','#ef6548','#d7301f','#b30000','#7f0000')[1:gypsyFamCnt]) +
   #ggtitle("Ty3/gypsy") +
