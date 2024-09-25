@@ -44,9 +44,9 @@ def main():
     
     try:
         # Process GFF3 and generate CSV
-        # analyzer = TEAnalyzer(args.dante_ltr_gff, args.genome_fasta, args.synonymous_substitution_rate, args.output_path, args.threads)
-        # out_csv_path = analyzer.csv_generator()
-        out_csv_path = "/home/pavel/Documents/Work/42_LH_Humulus_satellites/Akagi_Hj_Hl_haploidGenomeAssemeblies_Sep_2024/10-12_haploid/DANTE_LTR_summary/Hop_10_12hap_LTR_retrotransposons_annotation_chrOnly_TE_characteristics.csv"
+        analyzer = TEAnalyzer(args.dante_ltr_gff, args.genome_fasta, args.synonymous_substitution_rate, args.output_path, args.threads)
+        out_csv_path = analyzer.csv_generator()
+        # out_csv_path = "/home/pavel/Documents/Work/42_LH_Humulus_satellites/Akagi_Hj_Hl_haploidGenomeAssemeblies_Sep_2024/10-12_haploid/DANTE_LTR_summary/Hop_10_12hap_LTR_retrotransposons_annotation_chrOnly_TE_characteristics.csv"
         # Get length of thte longest sequence
         fasta_parser = FastaParser(args.genome_fasta)
         length_in_mb = fasta_parser.get_longest_sequence_in_mb()
