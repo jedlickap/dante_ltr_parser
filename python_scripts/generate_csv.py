@@ -47,9 +47,11 @@ class TEAnalyzer:
             ltr1_coord_l = [self.dnt_dict[te]['long_terminal_repeat'][0].start, self.dnt_dict[te]['long_terminal_repeat'][0].end]
             ltr2_coord_l = [self.dnt_dict[te]['long_terminal_repeat'][1].start, self.dnt_dict[te]['long_terminal_repeat'][1].end]
             avgLtrLen, ltr_len, ident, k80 = get_te_age(te_index, seq_id, ltr1_coord_l, ltr2_coord_l, self.genome_fa)
-            print(avgLtrLen, ltr_len, ident, k80)
             ltr_len_str = ",".join(map(str, ltr_len))
-            mya = round((k80 / (2 * self.ssr)) / 1000000, 4) if k80 else "NA"
+            if k80 > 0:
+                mya = round((k80 / (2 * self.ssr)) / 1000000, 4)
+            else:
+                mya = 0.0
             age_cat = self._get_age_cat(mya) if mya != "NA" else "NA"
             sfam, fam = self._get_te_fam(self.dnt_dict[te]['transposable_element'][0].attributes['Final_Classification'])
             pd_list = self._get_prot_doms(self.dnt_dict[te]['protein_domain'])
