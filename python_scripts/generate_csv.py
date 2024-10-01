@@ -96,9 +96,3 @@ class TEAnalyzer:
                 csv_file.write(line)
         
         return out_csv_path
-
-    # Example usage
-    # if __name__ == "__main__":
-    #     args = args_from_parser()
-    #     analyzer = TEAnalyzer(args.dante_ltr_gff, args.genome_fasta, args.synonymous_substitution_rate, args.output_path)
-    #     out_csv_path = analyzer.csv_generator()
