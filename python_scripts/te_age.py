@@ -9,7 +9,6 @@ def _get_fasta(seq_id, start, end, fasta, name):
     cmd = f"bedtools getfasta -fi {fasta} -bed seq.bed > {name}"
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     process.wait()
-    print(f"BEDTOOLS GETFASTA process.returncode: {process.returncode}")
     os.remove("seq.bed")
 
 def get_te_age(te_index, seq_id, ltr1_coord_l, ltr2_coord_l, fasta):
@@ -33,9 +32,9 @@ def get_te_age(te_index, seq_id, ltr1_coord_l, ltr2_coord_l, fasta):
     files2remove = ltr_fa_list
     # run stretcher
     cmd = "stretcher " + f"{ltr_fa_list[0]} {ltr_fa_list[1]} -outfile ltrIdent.txt"
-    process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    # Wait for the process to finish
     process.wait()
-    print(f"STRETCHER process.returncode: {process.returncode}")
     # parse ltr identity
     identReg = r' \(\s?(\d+\.\d+)%'
     ident = 0
@@ -43,7 +42,6 @@ def get_te_age(te_index, seq_id, ltr1_coord_l, ltr2_coord_l, fasta):
     with open("ltrIdent.txt") as identFile:
         for l in identFile:
             if "# Identity:" in l:
-                print(l.rstrip())
                 ident = float(re.search(identReg, l.rstrip()).group(1))
     files2remove.append("ltrIdent.txt")
 
@@ -67,8 +65,7 @@ def get_te_age(te_index, seq_id, ltr1_coord_l, ltr2_coord_l, fasta):
         cmd1 = f"clustalw infile.fa -output=PHYLIP"
         process = subprocess.Popen(cmd1, shell=True, stdout=subprocess.PIPE)
         process.wait()
-        print(f"CLUSTALW with phylip output process.returncode: {process.returncode}")
-
+        
         os.rename(f'infile.phy', 'infile')
         with open("opt_dnadist", "w") as out:
             out.write("infile\nR\nD\nY\n")
@@ -76,8 +73,7 @@ def get_te_age(te_index, seq_id, ltr1_coord_l, ltr2_coord_l, fasta):
         cmd1 = f"cat opt_dnadist | phylip dnadist"
         process = subprocess.Popen(cmd1, shell=True, stdout=subprocess.PIPE)
         process.wait()
-        print(f"PHYLIP K80 divergence process.returncode: {process.returncode}")
-
+        
         k80 = ""
         with open("outfile") as outfile:
             next(outfile)

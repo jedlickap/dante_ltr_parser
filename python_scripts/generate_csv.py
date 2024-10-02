@@ -4,7 +4,7 @@ from python_scripts.eval_te_autonomy import eval_te_autonomy
 from python_scripts.GFFsParsers import DanteLTrGFF
 from pathlib import Path
 import multiprocessing
-import os
+from time import sleep
 
 class TEAnalyzer:
     def __init__(self, dnt_gff, genome_fa, ssr, out_path, threads):
@@ -38,7 +38,6 @@ class TEAnalyzer:
         seq_id = self.dnt_dict[te]['transposable_element'][0].seqid
         te_id = self.dnt_dict[te]['transposable_element'][0].attributes['ID']
         if "partial" not in te_id:
-            print(f"CHROMOSOME: {seq_id}\nTEID: {te_id}")
             te_start = self.dnt_dict[te]['transposable_element'][0].start
             te_end = self.dnt_dict[te]['transposable_element'][0].end
             te_len = (te_end - te_start) + 1
@@ -59,14 +58,14 @@ class TEAnalyzer:
             bin_d = position_in_bins(seq_id, te_start, te_end, te_len, self.fasta_bin_dict)
             bin_sec_string = ",".join([bin_d[k][0].split("|")[0] for k in bin_d for rec in bin_d[k]])
             bin_inters_string = ",".join([bin_d[k][0].split("|")[1] for k in bin_d for rec in bin_d[k]])
-            print("\n")
             return(f"{seq_id},{te_id},{sfam},{fam},{tsd},{pbs},{prot_doms},{autonomy_status},{te_len},{avgLtrLen},{ltr_len_str},{ident},{k80},{mya},{age_cat},{bin_sec_string},{bin_inters_string}\n")
 
     # Helper function to unpack the tuple arguments
     def _get_csv_line_helper(self, data):
-        te, te_index = data
+        te, te_index, tes_total = data
+        print(f"Processing TE {te_index+1}/{tes_total}")            
         return self._get_csv_line(te, te_index)
-
+    
     def csv_generator(self):
         out_csv_path = f"{self.out_path}/{Path(self.dnt_gff).stem}_TE_characteristics.csv"
         
@@ -74,7 +73,7 @@ class TEAnalyzer:
         teid_list = [te for te in self.dnt_dict if "TE_partial" not in self.dnt_dict[te]['transposable_element'][0].attributes['ID']]
 
         # Prepare the data to pass to multiprocessing (tuples of (te, te_index))
-        te_data = [(te, index) for index, te in enumerate(teid_list)]
+        te_data = [(te, index, len(teid_list)) for index, te in enumerate(teid_list)]
 
         # Get number of available CPU cores and limit the number of threads (processes)
         num_workers = self.threads  # Use half the number of cores, at least 1 worker
@@ -83,6 +82,7 @@ class TEAnalyzer:
         with multiprocessing.Pool(processes=num_workers) as pool:
             # Use pool.map to parallelize the _get_csv_line function
             csv_lines = pool.map(self._get_csv_line_helper, te_data)
+            print("\n")
 
         # Write to the CSV file
         with open(out_csv_path, "w") as csv_file:
