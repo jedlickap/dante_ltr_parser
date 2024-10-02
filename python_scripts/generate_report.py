@@ -20,7 +20,25 @@ th, td {
 def generate_report(out_path, species):
     out_folder_path = out_path + "/tabs_and_plots/"
     df = pd.read_csv(f"{out_folder_path}summary_table.csv")
-    sum_tab = df.to_html(index=False)
+
+    # Apply the style to the rows where 'te_fam' contains 'Summary'
+    def highlight_summary(row):
+        if "Summary" in str(row['te_fam']):
+            return ['background-color: lightgrey'] * len(row)
+        else:
+            return [''] * len(row)
+
+    # Use the Styler to apply the highlighting
+    styled_df = (df.style
+                 .apply(highlight_summary, axis=1)
+                 .format(precision=2))  # Set float precision to 2 decimals
+
+    # Convert to HTML with the applied style
+    sum_tab = styled_df.hide(axis="index").to_html()
+
+    # Save or return the HTML table (saving in this example)
+    with open(f"{out_folder_path}styled_summary_table.html", "w") as f:
+        f.write(sum_tab)
 
     md = f"""
 
