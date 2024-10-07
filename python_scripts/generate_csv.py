@@ -40,31 +40,30 @@ class TEAnalyzer:
                 
     def _get_csv_line(self, te, te_index):
         seq_id = self.dnt_dict[te]['transposable_element'][0].seqid
-        te_id = self.dnt_dict[te]['transposable_element'][0].attributes['ID']
-        if "partial" not in te_id:
-            te_start = self.dnt_dict[te]['transposable_element'][0].start
-            te_end = self.dnt_dict[te]['transposable_element'][0].end
-            te_len = (te_end - te_start) + 1
-            tsd = bool(self.dnt_dict[te]['target_site_duplication'])
-            pbs = bool(self.dnt_dict[te]['primer_binding_site'])
-            ltr1_coord_l = [self.dnt_dict[te]['long_terminal_repeat'][0].start, self.dnt_dict[te]['long_terminal_repeat'][0].end]
-            ltr2_coord_l = [self.dnt_dict[te]['long_terminal_repeat'][1].start, self.dnt_dict[te]['long_terminal_repeat'][1].end]
-            avgLtrLen, ltr_len, ident, k80 = get_te_age(te_index, seq_id, ltr1_coord_l, ltr2_coord_l, self.genome_fa)
-            ltr_len_str = ",".join(map(str, ltr_len))
-            if k80 > 0:
-                mya = round((k80 / (2 * self.ssr)) / 1000000, 4)
-            else:
-                mya = 0.0
-            age_cat = self._get_age_cat(mya) if mya != "NA" else "NA"
-            sfam, fam = self._get_te_fam(self.dnt_dict[te]['transposable_element'][0].attributes['Final_Classification'])
-            pd_list = self._get_prot_doms(self.dnt_dict[te]['protein_domain'])
-            autonomy_status, prot_doms = eval_te_autonomy(sfam, fam, pd_list)
-            csv_lines = []
-            bin_d = position_in_bins(seq_id, te_start, te_end, te_len, self.fasta_bin_dict)
-            for bin_res in bin_d:
-                bin_sec = bin_d[bin_res][0].split("|")[0]
-                bin_inters = bin_d[bin_res][0].split("|")[1]
-                csv_lines.append(f"{bin_res},{seq_id},{te_id},{sfam},{fam},{tsd},{pbs},{prot_doms},{autonomy_status},{te_len},{avgLtrLen},{ltr_len_str},{ident},{k80},{mya},{age_cat},{bin_sec},{bin_inters}\n")
+        te_id = self.dnt_dict[te]['transposable_element'][0].attributes['ID']        
+        te_start = self.dnt_dict[te]['transposable_element'][0].start
+        te_end = self.dnt_dict[te]['transposable_element'][0].end
+        te_len = (te_end - te_start) + 1
+        tsd = bool(self.dnt_dict[te]['target_site_duplication'])
+        pbs = bool(self.dnt_dict[te]['primer_binding_site'])
+        ltr1_coord_l = [self.dnt_dict[te]['long_terminal_repeat'][0].start, self.dnt_dict[te]['long_terminal_repeat'][0].end]
+        ltr2_coord_l = [self.dnt_dict[te]['long_terminal_repeat'][1].start, self.dnt_dict[te]['long_terminal_repeat'][1].end]
+        avgLtrLen, ltr_len, ident, k80 = get_te_age(te_index, seq_id, ltr1_coord_l, ltr2_coord_l, self.genome_fa)
+        ltr_len_str = ",".join(map(str, ltr_len))
+        if k80 > 0:
+            mya = round((k80 / (2 * self.ssr)) / 1000000, 4)
+        else:
+            mya = 0.0
+        age_cat = self._get_age_cat(mya) if mya != "NA" else "NA"
+        sfam, fam = self._get_te_fam(self.dnt_dict[te]['transposable_element'][0].attributes['Final_Classification'])
+        pd_list = self._get_prot_doms(self.dnt_dict[te]['protein_domain'])
+        autonomy_status, prot_doms = eval_te_autonomy(sfam, fam, pd_list)
+        csv_lines = []
+        bin_d = position_in_bins(seq_id, te_start, te_end, te_len, self.fasta_bin_dict)
+        for bin_res in bin_d:
+            bin_sec = bin_d[bin_res][0].split("|")[0]
+            bin_inters = bin_d[bin_res][0].split("|")[1]
+            csv_lines.append(f"{bin_res},{seq_id},{te_id},{sfam},{fam},{tsd},{pbs},{prot_doms},{autonomy_status},{te_len},{avgLtrLen},{ltr_len_str},{ident},{k80},{mya},{age_cat},{bin_sec},{bin_inters}\n")
         return csv_lines
 
     # Helper function to unpack the tuple arguments
