@@ -3,10 +3,9 @@ args = commandArgs(trailingOnly=TRUE)
 
 # Rplots_from_csv
 csv_path <- args[1]
-longest_seq_length <- as.numeric(args[2])
 
 directory_path <- dirname(csv_path)
-# csv_path <- "Saaz_LTR_retrotransposons_annotation_TE_characteristics.csv"
+
 t <- read.csv(csv_path, header = T)
 
 # load used libraries
@@ -298,26 +297,12 @@ dev.off()
 
 # Chromosome specific abundance
 ## pick-up bins
-# Determine column names based on the value of longest_seq_length
-# less than 80Mbp -> 100kbp and more than 80Mbp 1Mbp
-if (longest_seq_length <= 80) {
-  xc_col <- t_copia$bin_100kbp
-  yc_col <- t_copia$inters_100kbp
-  sec <- '100kbp'
-} else {
-  xc_col <- t_copia$bin_1Mbp
-  yc_col <- t_copia$inters_1Mbp
-  sec <- '1Mbp'
-}
+cbins <- t_copia[[17]]
+cinters <- t_copia[[18]]
+gbins <- t_gypsy[[17]]
+ginters <- t_gypsy[[18]]
 
-if (longest_seq_length <= 80) {
-  xg_col <- t_gypsy$bin_100kbp
-  yg_col <- t_gypsy$inters_100kbp
-} else {
-  xg_col <- t_gypsy$bin_1Mbp
-  yg_col <- t_gypsy$inters_1Mbp
-}
-
+sec <- paste0(sub("bin_", "", colnames(t)[17]),"bp")
 
 twentyCols <- c('#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff', '#f5fffa')
 gypsyCols <- twentyCols[1:gypsyFamCnt]
@@ -325,24 +310,24 @@ cs <- gypsyFamCnt + 1
 ce <- (gypsyFamCnt+copiaFamCnt)+1
 copiaCols <-twentyCols[cs:ce]
 
-copiaPl7 <- ggplot(t_copia,aes(x=xc_col,y=yc_col,fill=te_fam)) +
+copiaPl7 <- ggplot(t_copia,aes(x=cbins,y=cinters,fill=te_fam)) +
   geom_bar(stat='identity', position = 'stack') +
   ggtitle("Ty1/copia") +
   scale_fill_manual(values = copiaCols,
                     name="TE family:") +
-  ylab(paste0("TE density [bp per ",sec,"]")) + 
+  ylab(paste0("TE density [bp per ",sec,"]")) +
   xlab(paste0("Chromosome sections [",sec,"]")) +
   theme_bw() +
   theme(plot.title = element_text(size = 20),  axis.text = element_text(size=12),
         strip.text.y = element_text(angle = 0)) +
   facet_grid(rows = vars(chromosome))
 
-gypsyPl7 <- ggplot(t_gypsy,aes(x=xg_col,y=yg_col,fill=te_fam)) +
+gypsyPl7 <- ggplot(t_gypsy,aes(x=gbins,y=ginters,fill=te_fam)) +
   geom_bar(stat='identity', position = 'stack') +
   ggtitle("Ty3/gypsy") +
   scale_fill_manual(values = gypsyCols,
                     name="TE family:") +
-  ylab(paste0("TE density [bp per ",sec,"]")) + 
+  ylab(paste0("TE density [bp per ",sec,"]")) +
   xlab(paste0("Chromosome sections [",sec,"]")) +
   theme_bw() +
   theme(plot.title = element_text(size = 20),  axis.text = element_text(size=12),
@@ -355,13 +340,14 @@ dev.off()
 
 # Plot age category
 ageCatCols <- rev(c('#ffeda0','#fed976','#feb24c','#fd8d3c','#fc4e2a','#e31a1c','#b10026'))
-copiaPl8 <- ggplot(t_copia,aes(x=xc_col,y=yc_col,fill=age_cat)) +
+copiaPl8 <- ggplot(t_copia,aes(x=cbins,y=cinters,fill=age_cat)) +
   geom_bar(stat='identity', position = 'stack') +
   ggtitle("Ty1/copia") +
-  scale_fill_discrete(name = "Insertion time [MYA]:",
-                      type = ageCatCols,
-                      labels = c("0.0-1.0","1.0-2.0","2.0-3.0","3.0-4.0","4.0-5.0","5.0-10.0",">10.0")) +
-  ylab(paste0("TE density [bp per ",sec,"]")) + 
+  scale_fill_manual(name = 'TE age category [MYA]:',
+                    values=ageCatCols,
+                    breaks = c('A','B','C','D','E','F','G'),
+                    labels=c("0.0-1.0","1.0-2.0","2.0-3.0","3.0-4.0","4.0-5.0","5.0-10.0",">10.0")) +
+  ylab(paste0("TE density [bp per ",sec,"]")) +
   xlab(paste0("Chromosome sections [",sec,"]")) +
   theme_bw() +
   theme(plot.title = element_text(size = 20),  axis.text = element_text(size=12),
@@ -369,13 +355,14 @@ copiaPl8 <- ggplot(t_copia,aes(x=xc_col,y=yc_col,fill=age_cat)) +
   facet_grid(rows = vars(chromosome))
 
 
-gypsyPl8 <- ggplot(t_gypsy,aes(x=xg_col,y=yg_col,fill=age_cat)) +
+gypsyPl8 <- ggplot(t_gypsy,aes(x=gbins,y=ginters,fill=age_cat)) +
   geom_bar(stat='identity', position = 'stack') +
   ggtitle("Ty3/gypsy") +
-  scale_fill_discrete(name = "Insertion time [MYA]:",
-                      type = ageCatCols,
-                      labels = c("0.0-1.0","1.0-2.0","2.0-3.0","3.0-4.0","4.0-5.0","5.0-10.0",">10.0")) +
-  ylab(paste0("TE density [bp per ",sec,"]")) + 
+  scale_fill_manual(name = 'TE age category [MYA]:',
+                    values=ageCatCols,
+                    breaks = c('A','B','C','D','E','F','G'),
+                    labels=c("0.0-1.0","1.0-2.0","2.0-3.0","3.0-4.0","4.0-5.0","5.0-10.0",">10.0")) +
+  ylab(paste0("TE density [bp per ",sec,"]")) +
   xlab(paste0("Chromosome sections [",sec,"]")) +
   theme_bw() +
   theme(plot.title = element_text(size = 20),  axis.text = element_text(size=12),
@@ -390,13 +377,14 @@ dev.off()
 
 # TE age chr and fam specific
 
-copiaPl9 <- ggplot(t_copia,aes(x=xc_col,y=yc_col,fill=age_cat)) +
+copiaPl9 <- ggplot(t_copia,aes(x=cbins,y=cinters,fill=age_cat)) +
   geom_bar(stat='identity', position = 'stack') +
   ggtitle("Ty1/copia") +
-  scale_fill_discrete(name = "Insertion time [MYA]:",
-                      type = ageCatCols,
-                      labels = c("0.0-1.0","1.0-2.0","2.0-3.0","3.0-4.0","4.0-5.0","5.0-10.0",">10.0")) +
-  ylab(paste0("TE density [bp per ",sec,"]")) + 
+  scale_fill_manual(name = 'TE age category [MYA]:',
+                    values=ageCatCols,
+                    breaks = c('A','B','C','D','E','F','G'),
+                    labels=c("0.0-1.0","1.0-2.0","2.0-3.0","3.0-4.0","4.0-5.0","5.0-10.0",">10.0")) +
+  ylab(paste0("TE density [bp per ",sec,"]")) +
   xlab(paste0("Chromosome sections [",sec,"]")) +
   theme_bw() +
   theme(plot.title = element_text(size = 20),  axis.text = element_text(size=12),
@@ -405,13 +393,14 @@ copiaPl9 <- ggplot(t_copia,aes(x=xc_col,y=yc_col,fill=age_cat)) +
              cols = vars(chromosome))
 
 
-gypsyPl9 <- ggplot(t_gypsy,aes(x=xg_col,y=yg_col,fill=age_cat)) +
+gypsyPl9 <- ggplot(t_gypsy,aes(x=gbins,y=ginters,fill=age_cat)) +
   geom_bar(stat='identity', position = 'stack') +
   ggtitle("Ty3/gypsy") +
-  scale_fill_discrete(name = "Insertion time [MYA]:",
-                      type = ageCatCols,
-                      labels = c("0.0-1.0","1.0-2.0","2.0-3.0","3.0-4.0","4.0-5.0","5.0-10.0",">10.0")) +
-  ylab(paste0("TE density [bp per ",sec,"]")) + 
+  scale_fill_manual(name = 'TE age category [MYA]:',
+                    values=ageCatCols,
+                    breaks = c('A','B','C','D','E','F','G'),
+                    labels=c("0.0-1.0","1.0-2.0","2.0-3.0","3.0-4.0","4.0-5.0","5.0-10.0",">10.0")) +
+  ylab(paste0("TE density [bp per ",sec,"]")) +
   xlab(paste0("Chromosome sections [",sec,"]")) +
   theme_bw() +
   theme(plot.title = element_text(size = 20),  axis.text = element_text(size=12),

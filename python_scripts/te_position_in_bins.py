@@ -1,6 +1,8 @@
+import math
 from Bio import SeqIO
 
 def get_mbp_bins(head, ch_len):
+    ch_len = math.ceil(ch_len / 1_000_000)*1_000_000
     l = []
     step = 1
     start = 0
@@ -14,6 +16,7 @@ def get_mbp_bins(head, ch_len):
     return l
 
 def get_100kbp_bins(head, ch_len):
+    ch_len = math.ceil(ch_len / 100_000)*100_000
     l = []
     step = 1
     start = 0
@@ -27,6 +30,7 @@ def get_100kbp_bins(head, ch_len):
     return l
 
 def get_10kbp_bins(head, ch_len):
+    ch_len = math.ceil(ch_len / 10_000)*10_000
     l = []
     step = 1
     start = 0
@@ -79,5 +83,7 @@ def position_in_bins(seq_id, te_start, te_end, te_len, fasta_bin_dict):
                 if get_intersect(bin_s, bin_e, te_start, te_end):
                     intersect_len = get_intersect(bin_s, bin_e, te_start, te_end)
                     if not bin_d[bin_cat]: 
+                        bin_d[bin_cat].append(f"{b_sec}|{intersect_len}")
+                    else:
                         bin_d[bin_cat].append(f"{b_sec}|{intersect_len}")
     return bin_d

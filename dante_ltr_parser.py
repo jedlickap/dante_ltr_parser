@@ -1,9 +1,9 @@
 import argparse
 import subprocess
 import os
+import traceback
 from python_scripts.generate_csv import TEAnalyzer
 from python_scripts.generate_report import generate_report
-from python_scripts.fasta_parser import FastaParser
 
 # args: genome fasta, dante_LTR GFF3, alternativelly s. substitution rate
 def args_from_parser():
@@ -47,12 +47,9 @@ def main():
         analyzer = TEAnalyzer(args.dante_ltr_gff, args.genome_fasta, args.synonymous_substitution_rate, args.output_path, args.threads)
         out_csv_path = analyzer.csv_generator()
         # out_csv_path = "/home/pavel/Documents/Work/42_LH_Humulus_satellites/Akagi_Hj_Hl_haploidGenomeAssemeblies_Sep_2024/10-12_haploid/DANTE_LTR_summary/Hop_10_12hap_LTR_retrotransposons_annotation_chrOnly_TE_characteristics.csv"
-        # Get length of thte longest sequence
-        fasta_parser = FastaParser(args.genome_fasta)
-        length_in_mb = fasta_parser.get_longest_sequence_in_mb()
-        #print(length_in_mb)
+        
         # Generate plots using R script
-        cmd = f"Rscript r_scripts/Rplots_from_csv.R {out_csv_path} {length_in_mb}"
+        cmd = f"Rscript r_scripts/Rplots_from_csv.R {out_csv_path}"
         process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = process.communicate()
         
@@ -67,6 +64,8 @@ def main():
     
     except Exception as e:
         print(f"An error occurred: {e}")
+    # Print detailed traceback information
+        traceback.print_exc()
 
 if __name__ == "__main__":
     main()
