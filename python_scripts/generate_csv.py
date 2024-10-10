@@ -71,9 +71,9 @@ class TEAnalyzer:
         return self._get_csv_line(te, te_index)
 
     def _assign_category(self, seq_len):
-        if seq_len <= 8:
+        if seq_len <= 1:
             return 'bin10k'
-        elif 8 < seq_len <= 80:
+        elif 1 < seq_len <= 100:
             return 'bin100k'
         else:
             return 'bin1M'
@@ -94,7 +94,7 @@ class TEAnalyzer:
         with multiprocessing.Pool(processes=num_workers) as pool:
             # Use pool.map to parallelize the _get_csv_line function
             csv_lines = []
-            for _ in pool.imap_unordered(self._get_csv_line_helper, te_data):
+            for _ in pool.imap_unordered(self._get_csv_line_helper, te_data, chunksize=20):
             # csv_lines = pool.map(self._get_csv_line_helper, te_data)
                 csv_lines.extend(_)
                 # report the number of remaining tasks
@@ -103,7 +103,7 @@ class TEAnalyzer:
 
         # Write to the CSV file
         for bin_res in ['bin10k','bin100k','bin1M']:
-            csv_bin_path = out_csv_path.replace(".csv",f"_{bin}.csv")
+            csv_bin_path = out_csv_path.replace(".csv",f"_{bin_res}.csv")
             write_header = not os.path.exists(csv_bin_path)
             
             with open(csv_bin_path, "a") as h:
