@@ -4,10 +4,8 @@ from python_scripts.eval_te_autonomy import eval_te_autonomy
 from python_scripts.fasta_parser import FastaParser
 from python_scripts.GFFsParsers import DanteLTrGFF
 from pathlib import Path
-from itertools import product
 import os
 import multiprocessing
-from time import sleep
 
 class TEAnalyzer:
     def __init__(self, dnt_gff, genome_fa, ssr, out_path, threads):
@@ -90,7 +88,7 @@ class TEAnalyzer:
         # Get number of available CPU cores and limit the number of threads (processes)
         num_workers = self.threads  # Use half the number of cores, at least 1 worker
 
-	# Create a pool of workers with limited threads
+	    # Create a pool of workers with limited threads
         with multiprocessing.Pool(processes=num_workers) as pool:
             # Use pool.map to parallelize the _get_csv_line function
             csv_lines = []
@@ -116,7 +114,7 @@ class TEAnalyzer:
                     if line.startswith(bin_res):
                         line = ",".join(line.split(",")[1:])
                         h.write(line + "\n")
-
+                        
         # Return CSV path for optimal bin category
         bin_cat = self._assign_category(self.length_in_mb)
         return out_csv_path.replace(".csv",f"_{bin_cat}.csv")
