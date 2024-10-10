@@ -114,7 +114,7 @@ class TEAnalyzer:
                     if line.startswith(bin_res):
                         line = ",".join(line.split(",")[1:])
                         h.write(line + "\n")
-                        
-        # Return CSV path for optimal bin category
+
+        # Return path for CSV with optimal bin category
         bin_cat = self._assign_category(self.length_in_mb)
         return out_csv_path.replace(".csv",f"_{bin_cat}.csv")
