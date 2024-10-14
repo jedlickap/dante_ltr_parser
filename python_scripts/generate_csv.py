@@ -98,23 +98,22 @@ class TEAnalyzer:
                 # report the number of remaining tasks
                 processed_tes = len({line.split(",")[1] + "|" + line.split(",")[2] for line in csv_lines})
                 print(f'{(processed_tes)}/{len(teid_list)} TEs completed')
-
+        
         # Write to the CSV file
         for bin_res in ['bin10k','bin100k','bin1M']:
             csv_bin_path = out_csv_path.replace(".csv",f"_{bin_res}.csv")
-            write_header = not os.path.exists(csv_bin_path)
             
-            with open(csv_bin_path, "a") as h:
-                if write_header:
-                    h.write("chromosome,te_id,te_sfam,te_fam,tsd,pbs,prot_doms,autonomy_stat,te_length,"
-                        "ltr_avg_len,ltr5_len,ltr3_len,ltr_identity,K80,MYA,age_cat,"
-                        f"bin_{bin_res},inters_{bin_res}\n")
-                
+            with open(csv_bin_path, "w") as h:
+                h.write("chromosome,te_id,te_sfam,te_fam,tsd,pbs,prot_doms,autonomy_stat,te_length,"
+                    "ltr_avg_len,ltr5_len,ltr3_len,ltr_identity,K80,MYA,age_cat,"
+                    f"bin_{bin_res},inters_{bin_res}\n")
+            
                 for line in csv_lines:
                     if line.startswith(bin_res):
                         line = ",".join(line.split(",")[1:])
-                        h.write(line + "\n")
-
+                        h.write(line)
+            print(f"CSV file: {csv_bin_path} was generated.")
+            
         # Return path for CSV with optimal bin category
         bin_cat = self._assign_category(self.length_in_mb)
         return out_csv_path.replace(".csv",f"_{bin_cat}.csv")

@@ -84,6 +84,6 @@ def position_in_bins(seq_id, te_start, te_end, te_len, fasta_bin_dict):
                     intersect_len = get_intersect(bin_s, bin_e, te_start, te_end)
                     if not bin_d[bin_cat]: 
                         bin_d[bin_cat].append(f"{b_sec}|{intersect_len}")
-                    else:
+                    elif f"{b_sec}|{intersect_len}" not in bin_d[bin_cat]:
                         bin_d[bin_cat].append(f"{b_sec}|{intersect_len}")
     return bin_d
