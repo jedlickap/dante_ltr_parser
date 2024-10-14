@@ -62,8 +62,8 @@ summary_table <- summary_table %>%
 # Summarize the required columns: sums and means
 summary_row <- summary_table %>%
   summarise(
-    te_sfam = unique(te_sfam), 
-    te_fam = "Summary",  # to make sure this is compatible with character columns
+    TE_sfam = unique(te_sfam), 
+    TE_fam = "Summary",  # to make sure this is compatible with character columns
     Count = sum(Count, na.rm = TRUE),
     TE_length = mean(TE_length, na.rm = TRUE),
     LTR_length = mean(LTR_length, na.rm = TRUE),
